@@ -1,7 +1,12 @@
 {
     "BLOCK": "page",
     "content": [
-        { "block": "header"},
-        { "block": "article", "content": "item" }
+        {
+            "block": "header"
+        },
+        {
+            "block": "article",
+            "content": "item"
+        }
     ]
 }

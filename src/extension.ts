@@ -1,4 +1,4 @@
-import { readFileSync, readFile } from "fs";
+import { readFileSync } from "fs";
 import { join, resolve, basename } from "path";
 import { bemhtml } from "bem-xjst";
 
@@ -8,14 +8,13 @@ import {
     LanguageClientOptions,
     ServerOptions,
     TransportKind,
-    SettingMonitor,
-    DocumentColorRequest
+    SettingMonitor
 } from 'vscode-languageclient';
 
 const serverBundleRelativePath = join('out', 'server.js');
 const previewPath: string = resolve( __dirname, '../preview/index.html');
 const previewHtml: string = readFileSync(previewPath).toString();
-const template = bemhtml.compile()
+const template = bemhtml.compile();
 
 let client: LanguageClient;
 const PANELS: Record<string, vscode.WebviewPanel> = {};
@@ -50,9 +49,11 @@ const createLanguageClient = (context: vscode.ExtensionContext): LanguageClient 
 const getPreviewKey = (doc: vscode.TextDocument): string => doc.uri.path;
 
 const getMediaPath = (context: vscode.ExtensionContext) => vscode.Uri
-    .file(context.extensionPath)
-    .with({ scheme: "resource"})
-    .toString() + '/';
+    .file(resolve(context.extensionPath, './preview') + '/')
+    .with({
+        scheme: 'vscode-resource'
+    })
+    .toString();
 
 const initPreviewPanel = (document: vscode.TextDocument) => {
     const key = getPreviewKey(document);
@@ -72,14 +73,15 @@ const initPreviewPanel = (document: vscode.TextDocument) => {
     const e = panel.onDidDispose(() => 
     {
         delete PANELS[key];
-        e.dispose()
+        e.dispose();
     });
 
     return panel;
 };
 
 const updateContent = (doc: vscode.TextDocument, context: vscode.ExtensionContext) => {
-    const panel = PANELS[doc.uri.path];
+    const key = getPreviewKey(doc);
+    const panel = PANELS[key];
 
     if (panel) {
         try {
@@ -87,9 +89,8 @@ const updateContent = (doc: vscode.TextDocument, context: vscode.ExtensionContex
             const data = JSON.parse(json);
             const html = template.apply(data);
 
-
             panel.webview.html = previewHtml 
-                .replace(/{{\s+(\w+)\s+}}/g, (str, key) => {
+                .replace(/{{(\w+)}}/g, (str, key) => {
                     switch (key) {
                         case 'content':
                             return html;
@@ -112,7 +113,9 @@ const openPreview = (context: vscode.ExtensionContext) => {
 
         const panel = PANELS[key];
 
-        if (panel) panel.reveal();
+        if (panel) {
+            panel.reveal();
+        }
         else {
             const panel = initPreviewPanel(document);
             updateContent(document, context);
