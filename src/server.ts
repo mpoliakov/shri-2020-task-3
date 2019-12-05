@@ -21,9 +21,11 @@ let docs = new TextDocuments();
 let conf: ExampleConfiguration | undefined = undefined;
 
 conn.onInitialize((params: InitializeParams) => {
+    let capabilities = params.capabilities;
+
     return {
         capabilities: {
-            textDocumentSync: 'always'
+            textDocumentSync: docs.syncKind
         }
     };
 });
@@ -79,7 +81,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
             ? [
                   {
                       key: RuleKeys.UppercaseNamesIsForbidden,
-                      loc: property.key.loc
+                      loc: property.loc
                   }
               ]
             : [];
