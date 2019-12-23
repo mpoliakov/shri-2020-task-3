@@ -24,6 +24,7 @@ export function makeLint<TProblemKey>(
                     walk(item, cbProp, cbObj);
                 });
                 break;
+                
             case 'Object':
                 cbObj(node);
     
@@ -35,7 +36,9 @@ export function makeLint<TProblemKey>(
         }
     }
 
-    function parseJson(json: string):JsonAST  {return jsonToAst(json); }
+    function parseJson(json: string):JsonAST {
+        return jsonToAst(json);
+    }
 
     const errors: LinterProblem<TProblemKey>[] = [];
     const ast: JsonAST = parseJson(json);

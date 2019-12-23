@@ -1,6 +1,7 @@
 {
 	"version": "0.2.0",
-	"configurations": [{
+	"configurations": [
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -12,6 +13,16 @@
 				"${workspaceFolder}/out/**/*.js"
 			],
 			"preLaunchTask": "npm: watch"
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to Server 6009",
+			"address": "localhost",
+			"protocol": "inspector",
+			"port": 6009,
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/out/server.js"]
 		},
 		{
 			"name": "Extension Tests",

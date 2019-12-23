@@ -2,7 +2,6 @@ import {
     createConnection,
     ProposedFeatures,
     TextDocuments,
-    InitializeParams,
     TextDocument,
     Diagnostic,
     DiagnosticSeverity,
@@ -10,6 +9,7 @@ import {
 } from 'vscode-languageserver';
 
 import { basename } from 'path';
+import * as fs from 'fs';
 
 import * as jsonToAst from "json-to-ast";
 
@@ -20,9 +20,7 @@ let conn = createConnection(ProposedFeatures.all);
 let docs = new TextDocuments();
 let conf: ExampleConfiguration | undefined = undefined;
 
-conn.onInitialize((params: InitializeParams) => {
-    let capabilities = params.capabilities;
-
+conn.onInitialize(() => {
     return {
         capabilities: {
             textDocumentSync: docs.syncKind
@@ -64,27 +62,33 @@ function GetMessage(key: RuleKeys): string {
 }
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-    const source = basename(textDocument.uri);
-    const json = textDocument.uri;
+    const documentName = basename(textDocument.uri);
+    const documentPath = decodeURIComponent(textDocument.uri).substr('file:///'.length);
+    let json = '';
 
-    const validateObject = (
-        obj: jsonToAst.AstObject
-    ): LinterProblem<RuleKeys>[] =>
-        obj.children.some(p => p.key.value === 'block')
+    try {
+        json = fs.readFileSync(documentPath).toString();
+    } catch (e) {
+        console.log(`Problems with reading ${documentName}: ${e}`);
+    }
+
+    const validateObject = (obj: jsonToAst.AstObject): LinterProblem<RuleKeys>[] => {
+        return obj.children.some(p => p.key.value === 'block')
             ? []
-            : [{ key: RuleKeys.BlockNameIsRequired, loc: obj.loc }];
+            : [{
+                key: RuleKeys.BlockNameIsRequired,
+                loc: obj.loc
+            }];
+    };
 
-    const validateProperty = (
-        property: jsonToAst.AstProperty
-    ): LinterProblem<RuleKeys>[] =>
-        /^[A-Z]+$/.test(property.key.value)
-            ? [
-                  {
-                      key: RuleKeys.UppercaseNamesIsForbidden,
-                      loc: property.loc
-                  }
-              ]
+    const validateProperty = (property: jsonToAst.AstProperty): LinterProblem<RuleKeys>[] => {
+        return /^[A-Z]+$/.test(property.key.value)
+            ? [{
+                key: RuleKeys.UppercaseNamesIsForbidden,
+                loc: property.loc
+            }]
             : [];
+    };
 
     const diagnostics: Diagnostic[] = makeLint(
         json,
@@ -109,7 +113,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
                     },
                     severity,
                     message,
-                    source
+                    source : documentName
                 };
 
                 list.push(diagnostic);

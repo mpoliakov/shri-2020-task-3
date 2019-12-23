@@ -12,7 +12,8 @@ import {
 } from 'vscode-languageclient';
 
 const serverBundleRelativePath = join('out', 'server.js');
-const previewPath: string = resolve( __dirname, '../preview/index.html');
+//const serverBundlePath = resolve(__dirname, '../out/server.js');
+const previewPath: string = resolve(__dirname, '../preview/index.html');
 const previewHtml: string = readFileSync(previewPath).toString();
 const template = bemhtml.compile();
 
