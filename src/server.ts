@@ -132,6 +132,13 @@ docs.onDidChangeContent(async (change) => {
     });
 });
 
+docs.onDidClose((change) => {
+    conn.sendDiagnostics({
+        uri: change.document.uri,
+        diagnostics: []
+    });
+});
+
 conn.onDidChangeConfiguration(({ settings }: DidChangeConfigurationParams) => {
     conf = settings.example;
     validateAll();
