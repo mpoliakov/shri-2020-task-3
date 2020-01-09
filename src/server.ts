@@ -34,7 +34,7 @@ function GetSeverity(key: RuleKeys): DiagnosticSeverity | undefined {
 
     switch (severity) {
         case Severity.Error:
-            return DiagnosticSeverity.Information;
+            return DiagnosticSeverity.Error;
         case Severity.Warning:
             return DiagnosticSeverity.Warning;
         case Severity.Information:
