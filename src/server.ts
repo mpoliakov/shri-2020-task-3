@@ -9,10 +9,7 @@ import {
 } from 'vscode-languageserver';
 
 import { basename } from 'path';
-import * as fs from 'fs';
-
-import * as jsonToAst from "json-to-ast";
-
+import * as jsonToAst from 'json-to-ast';
 import { ExampleConfiguration, Severity, RuleKeys } from './configuration';
 import { makeLint, LinterProblem } from './linter';
 
@@ -61,16 +58,8 @@ function GetMessage(key: RuleKeys): string {
     return `Unknown problem type '${key}'`;
 }
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
+async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
     const documentName = basename(textDocument.uri);
-    const documentPath = decodeURIComponent(textDocument.uri).substr('file:///'.length);
-    let json = '';
-
-    try {
-        json = fs.readFileSync(documentPath).toString();
-    } catch (e) {
-        console.log(`Problems with reading ${documentName}: ${e}`);
-    }
 
     const validateObject = (obj: jsonToAst.AstObject): LinterProblem<RuleKeys>[] => {
         return obj.children.some(p => p.key.value === 'block')
@@ -91,7 +80,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
     };
 
     const diagnostics: Diagnostic[] = makeLint(
-        json,
+        textDocument.getText(),
         validateProperty,
         validateObject
     ).reduce(
@@ -106,9 +95,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
                 let diagnostic: Diagnostic = {
                     range: {
-                        start: textDocument.positionAt(
-                            problem.loc.start.offset
-                        ),
+                        start: textDocument.positionAt(problem.loc.start.offset),
                         end: textDocument.positionAt(problem.loc.end.offset)
                     },
                     severity,
@@ -124,19 +111,25 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
         []
     );
 
-    if (diagnostics.length) {
-        conn.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-    }
+    return diagnostics;
 }
 
 async function validateAll() {
     for (const document of docs.all()) {
-        await validateTextDocument(document);
+        const diagnostics = await validateTextDocument(document);
+        conn.sendDiagnostics({
+            uri: document.uri,
+            diagnostics
+        });
     }
 }
 
-docs.onDidChangeContent(change => {
-    validateTextDocument(change.document);
+docs.onDidChangeContent(async (change) => {
+    const diagnostics = await validateTextDocument(change.document);
+    conn.sendDiagnostics({
+        uri: change.document.uri,
+        diagnostics
+    });
 });
 
 conn.onDidChangeConfiguration(({ settings }: DidChangeConfigurationParams) => {
