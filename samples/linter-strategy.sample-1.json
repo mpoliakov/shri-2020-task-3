@@ -1,0 +1,44 @@
+[
+  {
+    "block": "text",
+    "mods": {
+      "type": "h2"
+    }
+  },
+  {
+    "block": "text",
+    "mods": {
+      "type": "h1"
+    }
+  },
+  {
+    "block": "warning",
+    "content": [
+      {
+        "block": "text",
+        "mods": {
+          "size": "l"
+        }
+      },
+      {
+        "block": "text",
+        "mods": {
+          "size": "m"
+        }
+      },
+      {
+        "block": "text",
+        "mods": {
+          "size": "m",
+          "type": "h1"
+        }
+      },
+      {
+        "block": "placeholder",
+        "mods": {
+          "size": "xl"
+        }
+      }
+    ]
+  }
+]

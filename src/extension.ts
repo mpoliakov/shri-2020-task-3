@@ -41,7 +41,7 @@ const createLanguageClient = (context: vscode.ExtensionContext): LanguageClient 
         synchronize: { configurationSection: 'example' }
     };
 
-    client = new LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+    client = new LanguageClient('designSystemLinter', 'Design System Linter', serverOptions, clientOptions);
 
     return client;
 };

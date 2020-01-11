@@ -1,0 +1,72 @@
+{
+  "block": "grid",
+  "mods": {
+    "m-columns": "12"
+  },
+  "content": [
+    {
+      "block": "grid",
+      "elem": "fraction",
+      "elemMods": {
+        "m-col": "2"
+      },
+      "content": [
+        {
+          "block": "warning",
+          "content": [
+            {
+              "block": "text",
+              "mods": {
+                "type": "h3"
+              }
+            },
+            {
+              "block": "button",
+              "mods": {
+                "size": "m"
+              }
+            },
+            {
+              "block": "placeholder",
+              "mods": {
+                "size": "m"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "block": "grid",
+      "elem": "fraction",
+      "elemMods": {
+        "m-col": "3"
+      },
+      "content": [
+        {
+          "block": "cover",
+          "content": [
+            {
+              "block": "text",
+              "mods": {
+                "type": "h2"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "block": "grid",
+      "elem": "fraction",
+      "elemMods": {
+        "m-col": "7"
+      },
+      "content": [
+        {
+          "block": "offer"
+        }
+      ]
+    }
+  ]
+}

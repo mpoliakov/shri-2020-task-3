@@ -5,17 +5,18 @@ import {
     TextDocument,
     Diagnostic,
     DiagnosticSeverity,
-    DidChangeConfigurationParams
+    DidChangeConfigurationParams,
+    Position
 } from 'vscode-languageserver';
 
 import { basename } from 'path';
-import * as jsonToAst from 'json-to-ast';
-import { ExampleConfiguration, Severity, RuleKeys } from './configuration';
-import { makeLint, LinterProblem } from './linter';
+import { InitialConfiguration, Severity, getLinterProblemCode } from './configuration';
+import { lint } from './linter/linter';
+import LinterProblem from './linter/linter-problem';
 
 const conn = createConnection(ProposedFeatures.all);
 const docs = new TextDocuments();
-let conf: ExampleConfiguration | undefined = undefined;
+let conf: InitialConfiguration | undefined = undefined;
 
 conn.onInitialize(() => {
     return {
@@ -25,12 +26,21 @@ conn.onInitialize(() => {
     };
 });
 
-function GetSeverity(key: RuleKeys): DiagnosticSeverity | undefined {
+function GetSeverity(code: string): DiagnosticSeverity | undefined {
     if (!conf || !conf.severity) {
         return undefined;
     }
 
-    const severity: Severity = conf.severity[key];
+    const linterProblemCode = getLinterProblemCode(code);
+    if (!linterProblemCode) {
+        return undefined;
+    }
+
+    if ((conf.severity)[linterProblemCode] === undefined) {
+        return undefined;
+    }
+
+    const severity: Severity = (conf.severity)[linterProblemCode];
 
     switch (severity) {
         case Severity.Error:
@@ -46,65 +56,34 @@ function GetSeverity(key: RuleKeys): DiagnosticSeverity | undefined {
     }
 }
 
-function GetMessage(key: RuleKeys): string {
-    if (key === RuleKeys.BlockNameIsRequired) {
-        return 'Field named \'block\' is required!';
-    }
-
-    if (key === RuleKeys.UppercaseNamesIsForbidden) {
-        return 'Uppercase properties are forbidden!';
-    }
-
-    return `Unknown problem type '${key}'`;
-}
-
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
     const documentName = basename(textDocument.uri);
 
-    const validateObject = (obj: jsonToAst.AstObject): LinterProblem<RuleKeys>[] => {
-        return obj.children.some(p => p.key.value === 'block')
-            ? []
-            : [{
-                key: RuleKeys.BlockNameIsRequired,
-                loc: obj.loc
-            }];
-    };
-
-    const validateProperty = (property: jsonToAst.AstProperty): LinterProblem<RuleKeys>[] => {
-        return /^[A-Z]+$/.test(property.key.value)
-            ? [{
-                key: RuleKeys.UppercaseNamesIsForbidden,
-                loc: property.loc
-            }]
-            : [];
-    };
-
-    const diagnostics: Diagnostic[] = makeLint(
-        textDocument.getText(),
-        validateProperty,
-        validateObject
-    ).reduce(
+    const diagnostics: Diagnostic[] = lint(textDocument.getText()).reduce(
         (
             list: Diagnostic[],
-            problem: LinterProblem<RuleKeys>
-        ): Diagnostic[] => {
-            const severity = GetSeverity(problem.key);
+            problem: LinterProblem
+            ): Diagnostic[] => {
+            
+            const severity = GetSeverity(problem.code);
 
-            if (severity) {
-                const message = GetMessage(problem.key);
-
-                const diagnostic: Diagnostic = {
-                    range: {
-                        start: textDocument.positionAt(problem.loc.start.offset),
-                        end: textDocument.positionAt(problem.loc.end.offset)
-                    },
-                    severity,
-                    message,
-                    source : documentName
-                };
-
-                list.push(diagnostic);
+            if (!severity) {
+                return list;
             }
+
+            const message = problem.error;
+            const start = Position.create(problem.location.start.line - 1, problem.location.start.column - 1);
+            const end = Position.create(problem.location.end.line - 1, problem.location.end.column - 1);
+
+            list.push({
+                range: {
+                    start,
+                    end
+                },
+                severity,
+                message,
+                source : documentName
+            });
 
             return list;
         },

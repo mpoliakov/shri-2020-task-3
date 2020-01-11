@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
 		"target": "es6",
+		"module": "commonjs",
 		"outDir": "out",
 		"lib": [
 			"es6"
@@ -11,10 +11,14 @@
 		"strict": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUnusedParameters": true
+		"noUnusedParameters": true,
+		"esModuleInterop": true,
+		"allowJs": true
 	},
 	"exclude": [
 		"node_modules",
-		".vscode-test"
+		".vscode-test",
+		"preview",
+		"out"
 	]
 }

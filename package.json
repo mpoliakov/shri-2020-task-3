@@ -24,7 +24,7 @@
 					"default": false,
 					"description": "Enable/disable example linter."
 				},
-				"example.severity.uppercaseNamesIsForbidden": {
+				"example.severity.warningTextSizesShouldBeEqual": {
 					"type": "string",
 					"enum": [
 						"Error",
@@ -34,9 +34,9 @@
 						"None"
 					],
 					"default": "Warning",
-					"description": "The 'uppercaseNamesIsForbidden' rule severity."
+					"description": "Все тексты (блоки text) в блоке warning должны быть одного размера, то есть c одинаковым значением модификатора size, и этот размер должен быть определен. Размер первого из таких элементов в форме будем считать эталонным."
 				},
-				"example.severity.blockNameIsRequired": {
+				"example.severity.warningInvalidButtonSize": {
 					"type": "string",
 					"enum": [
 						"Error",
@@ -46,7 +46,79 @@
 						"None"
 					],
 					"default": "Warning",
-					"description": "The 'blockNameIsRequired' rule severity."
+					"description": "Размер кнопки блока warning должен быть на 1 шаг больше эталонного."
+				},
+				"example.severity.warningInvalidButtonPosition": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Блок button в блоке warning не может находиться перед блоком placeholder на том же или более глубоком уровне вложенности."
+				},
+				"example.severity.warningInvalidPlaceholderSize": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Допустимые размеры для блока placeholder в блоке warning (значение модификатора size): s, m, l."
+				},
+				"example.severity.textSeveralH1": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Заголовок первого уровня (блок text с модификатором type h1) на странице должен быть единственным."
+				},
+				"example.severity.textInvalidH2Position": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Заголовок второго уровня (блок text с модификатором type h2) не может находиться перед заголовком первого уровня на том же или более глубоком уровне вложенности."
+				},
+				"example.severity.textInvalidH3Position": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Заголовок третьего уровня (блок text с модификатором type h3) не может находиться перед заголовком второго уровня на том же или более глубоком уровне вложенности."
+				},
+				"example.severity.gridTooMuchMarketingBlocks": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"None"
+					],
+					"default": "Warning",
+					"description": "Маркетинговые блоки (commercial, offer) занимают не больше половины от всех колонок блока grid."
 				}
 			}
 		},
@@ -94,7 +166,7 @@
 		"@typescript-eslint/parser": "^2.15.0",
 		"eslint": "^6.8.0",
 		"tslint": "^5.12.1",
-		"typescript": "^3.4.5"
+		"typescript": "^3.7.4"
 	},
 	"dependencies": {
 		"bem-xjst": "^8.9.6",
