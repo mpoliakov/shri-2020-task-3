@@ -1,4 +1,4 @@
-import * as jsonToAst from "json-to-ast";
+import * as jsonToAst from 'json-to-ast';
 
 export type JsonAST = jsonToAst.AstJsonEntity | undefined;
 
@@ -17,7 +17,7 @@ export function makeLint<TProblemKey>(
         node: jsonToAst.AstJsonEntity, 
         cbProp: (property: jsonToAst.AstProperty) => void,
         cbObj: (property: jsonToAst.AstObject) => void
-    ) {
+    ): void {
         switch (node.type) {
             case 'Array':
                 node.children.forEach((item: jsonToAst.AstJsonEntity) => {
@@ -36,7 +36,7 @@ export function makeLint<TProblemKey>(
         }
     }
 
-    function parseJson(json: string):JsonAST {
+    function parseJson(json: string): JsonAST {
         return jsonToAst(json);
     }
 

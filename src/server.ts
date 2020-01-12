@@ -13,8 +13,8 @@ import * as jsonToAst from 'json-to-ast';
 import { ExampleConfiguration, Severity, RuleKeys } from './configuration';
 import { makeLint, LinterProblem } from './linter';
 
-let conn = createConnection(ProposedFeatures.all);
-let docs = new TextDocuments();
+const conn = createConnection(ProposedFeatures.all);
+const docs = new TextDocuments();
 let conf: ExampleConfiguration | undefined = undefined;
 
 conn.onInitialize(() => {
@@ -93,7 +93,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
             if (severity) {
                 const message = GetMessage(problem.key);
 
-                let diagnostic: Diagnostic = {
+                const diagnostic: Diagnostic = {
                     range: {
                         start: textDocument.positionAt(problem.loc.start.offset),
                         end: textDocument.positionAt(problem.loc.end.offset)
@@ -114,7 +114,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
     return diagnostics;
 }
 
-async function validateAll() {
+async function validateAll(): Promise<void> {
     for (const document of docs.all()) {
         const diagnostics = await validateTextDocument(document);
         conn.sendDiagnostics({

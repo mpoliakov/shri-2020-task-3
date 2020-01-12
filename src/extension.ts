@@ -1,6 +1,6 @@
-import { readFileSync } from "fs";
-import { join, resolve, basename } from "path";
-import { bemhtml } from "bem-xjst";
+import { readFileSync } from 'fs';
+import { join, resolve, basename } from 'path';
+import { bemhtml } from 'bem-xjst';
 
 import * as vscode from 'vscode';
 import {
@@ -48,14 +48,14 @@ const createLanguageClient = (context: vscode.ExtensionContext): LanguageClient 
 
 const getPreviewKey = (doc: vscode.TextDocument): string => doc.uri.path;
 
-const getMediaPath = (context: vscode.ExtensionContext) => vscode.Uri
+const getMediaPath = (context: vscode.ExtensionContext): string => vscode.Uri
     .file(resolve(context.extensionPath, './preview') + '/')
     .with({
         scheme: 'vscode-resource'
     })
     .toString();
 
-const initPreviewPanel = (document: vscode.TextDocument) => {
+const initPreviewPanel = (document: vscode.TextDocument): vscode.WebviewPanel => {
     const key = getPreviewKey(document);
     const fileName = basename(document.fileName);
 
@@ -79,7 +79,10 @@ const initPreviewPanel = (document: vscode.TextDocument) => {
     return panel;
 };
 
-const updateContent = (doc: vscode.TextDocument, context: vscode.ExtensionContext) => {
+const updateContent = (
+    doc: vscode.TextDocument,
+    context: vscode.ExtensionContext
+    ): void => {
     const key = getPreviewKey(doc);
     const panel = PANELS[key];
 
@@ -100,11 +103,14 @@ const updateContent = (doc: vscode.TextDocument, context: vscode.ExtensionContex
                             return str;
                     }
                 });
-        } catch(e) {}
+        }
+        catch {
+            return;
+        }
     }
 };
 
-const openPreview = (context: vscode.ExtensionContext) => {
+const openPreview = (context: vscode.ExtensionContext): void => {
     const editor = vscode.window.activeTextEditor;
 
     if (editor !== undefined) {
@@ -124,7 +130,7 @@ const openPreview = (context: vscode.ExtensionContext) => {
     }
 };
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
 
     console.info('Congratulations, your extension is now active!');
 
@@ -140,6 +146,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(previewCommand, eventChange);
 }
 
-export function deactivate() {
+export function deactivate(): void {
     client.stop();
 }
