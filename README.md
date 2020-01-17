@@ -12,3 +12,5 @@
 - При закрытии файла надо очищать Problems для данного файла ([commit](https://github.com/mpoliakov/shri-2020-task-3/commit/e4801d85b1c528be26ff78f804e0ea9d6eb3583a#diff-916156c481141bfcd08c6ae40ce10e00));
 - Исправил определение DiagnosticSeverity.Error (было Information) ([commit](https://github.com/mpoliakov/shri-2020-task-3/commit/5ae32c14fb011f77b2397e7b34e7661e2f7bcc06#diff-916156c481141bfcd08c6ae40ce10e00));
 - Удалил комментарии из json-файлов, формат json не поддерживает комментарии ([commit](https://github.com/mpoliakov/shri-2020-task-3/commit/46c82ba729841563cc6778c148bf10b4717676bd#diff-24c73412592dac9d8b9a739107c2c905));
+
+**Подключил стили из задания 1 и линтер из задания 2.**
