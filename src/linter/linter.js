@@ -117,8 +117,7 @@ var SeveralH1 = (function (_super) {
         return bemBlock && bemBlock.block === 'text' && ((_a = bemBlock.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1';
     };
     SeveralH1.prototype.lint = function (bemBlocks) {
-        var _a;
-        var h1Blocks = (_a = bemBlocks) === null || _a === void 0 ? void 0 : _a.filter(function (i) { var _a; return i.block === 'text' && ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1'; });
+        var h1Blocks = bemBlocks.filter(function (i) { var _a; return i.block === 'text' && ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1'; });
         var result = [];
         if (h1Blocks.length > 1) {
             for (var i = 1; i < h1Blocks.length; i++) {
@@ -144,14 +143,15 @@ var InvalidH2Position = (function (_super) {
         return bemBlock && bemBlock.block === 'text' && (((_a = bemBlock.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1' || ((_b = bemBlock.mods) === null || _b === void 0 ? void 0 : _b.get('type')) === 'h2');
     };
     InvalidH2Position.prototype.lint = function (bemBlocks) {
-        var _a;
         var hBlocks = bemBlocks.filter(function (i) { var _a, _b; return i.block === 'text' && (((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1') || ((_b = i.mods) === null || _b === void 0 ? void 0 : _b.get('type')) === 'h2'; });
-        var h1Index = (_a = hBlocks) === null || _a === void 0 ? void 0 : _a.findIndex(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1'; });
-        if (h1Index <= 0) {
+        var h1Blocks = hBlocks.filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h1'; });
+        if (h1Blocks.length === 0) {
             return [];
         }
+        var lastH1Block = h1Blocks[h1Blocks.length - 1];
+        var lastH1Index = hBlocks.lastIndexOf(lastH1Block);
         var result = [];
-        var h2BlocksBeforeH1 = bemBlocks.slice(0, h1Index).filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2'; });
+        var h2BlocksBeforeH1 = hBlocks.slice(0, lastH1Index).filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2'; });
         for (var _i = 0, h2BlocksBeforeH1_1 = h2BlocksBeforeH1; _i < h2BlocksBeforeH1_1.length; _i++) {
             var h2Block = h2BlocksBeforeH1_1[_i];
             result = __spreadArrays(result, [{
@@ -175,14 +175,15 @@ var InvalidH3Position = (function (_super) {
         return bemBlock && bemBlock.block === 'text' && (((_a = bemBlock.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2' || ((_b = bemBlock.mods) === null || _b === void 0 ? void 0 : _b.get('type')) === 'h3');
     };
     InvalidH3Position.prototype.lint = function (bemBlocks) {
-        var _a;
         var hBlocks = bemBlocks.filter(function (i) { var _a, _b; return i.block === 'text' && (((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2') || ((_b = i.mods) === null || _b === void 0 ? void 0 : _b.get('type')) === 'h3'; });
-        var h2Index = (_a = hBlocks) === null || _a === void 0 ? void 0 : _a.findIndex(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2'; });
-        if (h2Index <= 0) {
+        var h2Blocks = hBlocks.filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h2'; });
+        if (h2Blocks.length === 0) {
             return [];
         }
+        var lastH2Block = h2Blocks[h2Blocks.length - 1];
+        var lastH2Index = hBlocks.lastIndexOf(lastH2Block);
         var result = [];
-        var h3BlocksBeforeH2 = bemBlocks.slice(0, h2Index).filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h3'; });
+        var h3BlocksBeforeH2 = hBlocks.slice(0, lastH2Index).filter(function (i) { var _a; return ((_a = i.mods) === null || _a === void 0 ? void 0 : _a.get('type')) === 'h3'; });
         for (var _i = 0, h3BlocksBeforeH2_1 = h3BlocksBeforeH2; _i < h3BlocksBeforeH2_1.length; _i++) {
             var h3Block = h3BlocksBeforeH2_1[_i];
             result = __spreadArrays(result, [{
@@ -209,7 +210,7 @@ var TextSizesShouldBeEqual = (function (_super) {
         if (!bemBlock.content || bemBlock.content.blocks.length === 0) {
             return [];
         }
-        var textBlocks = bemBlock.content.blocks.filter(function (b) { return b.block === 'text'; });
+        var textBlocks = bemBlock.findNestedBlocks(['text']);
         if (textBlocks.length > 1 && textBlocks[0].mods) {
             var etalonSize = (_a = textBlocks[0].mods) === null || _a === void 0 ? void 0 : _a.get('size');
             for (var i = 1; i < textBlocks.length; i++) {
@@ -255,7 +256,7 @@ var InvalidButtonSize = (function (_super) {
         if (!bemBlock.content || bemBlock.content.blocks.length === 0) {
             return [];
         }
-        var textBlocks = bemBlock.content.blocks.filter(function (b) { return b.block === 'text'; });
+        var textBlocks = bemBlock.findNestedBlocks(['text']);
         if (textBlocks.length === 0 || !textBlocks[0].mods) {
             return [];
         }
@@ -264,7 +265,7 @@ var InvalidButtonSize = (function (_super) {
             return [];
         }
         var etalonButtonSize = incrementSizeMod(etalonSize);
-        var buttonBlocks = bemBlock.content.blocks.filter(function (b) { return b.block === 'button'; });
+        var buttonBlocks = bemBlock.findNestedBlocks(['button']);
         var result = [];
         for (var _i = 0, buttonBlocks_1 = buttonBlocks; _i < buttonBlocks_1.length; _i++) {
             var btn = buttonBlocks_1[_i];
@@ -326,8 +327,8 @@ var InvalidPlaceholderSize = (function (_super) {
         if (!bemBlock.content || bemBlock.content.blocks.length === 0) {
             return [];
         }
-        var placeholderBlocks = bemBlock.content.blocks.filter(function (b) { return b.block === 'placeholder'; });
-        if (!placeholderBlocks.length) {
+        var placeholderBlocks = bemBlock.findNestedBlocks(['placeholder']);
+        if (placeholderBlocks.length === 0) {
             return [];
         }
         var result = [];
